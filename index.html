@@ -1,163 +1,81 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lumi — Together.ai Only</title>
-<style>
-:root{--bg1:#0b1220;--bg2:#0f172a;--panel:#111827;--border:#1f2937;--text:#e5e7eb;--muted:#9ca3af;--accent:#6366f1;--ok:#34d399;--warn:#f59e0b;--err:#ef4444;}
-*{box-sizing:border-box}html,body{height:100%}
-body{margin:0;background:radial-gradient(1200px 800px at 50% 20%,#13203f 0%,var(--bg2) 50%,var(--bg1) 100%);color:var(--text);font-family:system-ui,Segoe UI,Roboto,Inter,Arial;overflow:hidden}
-.center{position:absolute;inset:0;display:grid;place-items:center}
-.avatar-wrap{width:clamp(280px,38vw,440px);aspect-ratio:1/1.15;border-radius:24px;background:#111827;border:1px solid var(--border);display:grid;place-items:center;position:relative;cursor:pointer;box-shadow:0 30px 80px rgba(0,0,0,.35)}
-.badge{position:absolute;top:10px;right:12px;font-size:12px;color:var(--muted);background:rgba(15,23,42,.7);border:1px solid var(--border);padding:6px 8px;border-radius:10px;display:inline-flex;gap:8px;align-items:center}
-.dot{width:8px;height:8px;border-radius:999px;background:var(--ok)}
-.floating-chat{position:fixed;right:18px;bottom:18px;z-index:40}.fab{width:56px;height:56px;border-radius:999px;border:none;background:var(--accent);color:#fff;font-size:22px;cursor:pointer}
-.sheet{position:fixed;left:0;right:0;bottom:-70vh;height:70vh;z-index:50;background:#0f172a;border-top:1px solid var(--border);border-radius:16px 16px 0 0;transition:transform .35s ease;transform:translateY(0)}
-.sheet.open{transform:translateY(-70vh)}.sheet .grip{width:48px;height:5px;background:#334155;border-radius:999px;margin:8px auto}
-.sheet-inner{height:calc(100% - 26px);display:grid;grid-template-rows:auto 1fr auto;gap:8px;padding:10px 12px 12px}
-.tiny{font-size:12px;color:var(--muted)}.topbar{display:flex;gap:8px;align-items:center;justify-content:space-between}
-.log{overflow:auto;padding:8px;border:1px solid var(--border);border-radius:12px;background:#0b1324}
-.msg{max-width:78%;margin:10px 0;padding:10px 12px;border-radius:12px;font-size:14px;border:1px solid #243044;white-space:pre-wrap;word-break:break-word}
-.msg.user{margin-left:auto;background:#1c2a52;border-color:#334155}.msg.assistant{margin-right:auto;background:#0f172a;border-color:#1f2937}
-.row{display:flex;gap:8px;align-items:center}
-input[type=text]{flex:1;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#0b1324;color:#e5e7eb}
-.btn{padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#0f172a;color:#e5e7eb;cursor:pointer}
-.btn.primary{background:var(--accent);border-color:transparent;color:#fff}
-.api-box{display:flex;gap:8px;align-items:center;background:#0b1324;border:1px dashed #334155;padding:8px 10px;border-radius:10px}
-.api-box input, .api-box select{padding:8px 10px;border-radius:8px;border:1px solid #334155;background:#0a1324;color:#e5e7eb}
-.api-box .grow{flex:1}
-</style>
+  <meta charset="utf-8" />
+  <title>Lumi AI — Your Anime AI Friend</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { margin:0; font-family:system-ui, sans-serif; background:#0b1220; color:#e5e7eb; text-align:center; }
+    header { padding:60px 20px; }
+    h1 { font-size:2.5rem; margin:0; }
+    p { color:#9ca3af; font-size:1.2rem; max-width:600px; margin:20px auto; }
+    .hero-avatar { width:220px; margin:30px auto; }
+    .btn { display:inline-block; margin:10px; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:bold; }
+    .btn-primary { background:#6366f1; color:white; }
+    section { padding:60px 20px; max-width:900px; margin:0 auto; }
+    .pricing { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; }
+    .card { background:#111827; padding:20px; border-radius:12px; border:1px solid #1f2937; }
+
+    /* Chat preview */
+    .chat-preview { background:#111827; border:1px solid #1f2937; border-radius:12px; padding:20px; max-width:420px; margin:40px auto; text-align:left; font-size:14px; }
+    .msg { padding:10px 14px; margin:10px 0; border-radius:12px; display:inline-block; max-width:75%; white-space:pre-wrap; word-wrap:break-word; }
+    .msg.user { background:#1c2a52; margin-left:auto; display:block; }
+    .msg.lumi { background:#0f172a; border:1px solid #1f2937; display:block; margin-right:auto; }
+    .typing { border-right:2px solid #e5e7eb; display:inline-block; animation:blink 1s step-start infinite; }
+    @keyframes blink { 50% { border-color: transparent; } }
+  </style>
 </head>
 <body>
-  <div class="center">
-    <div id="avatar" class="avatar-wrap">
-      <div class="badge"><span id="status-text">Cloud mode ready</span><span id="dot" class="dot"></span></div>
-      <!-- simple MVP face -->
-      <svg width="72%" viewBox="0 0 220 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="110" cy="130" r="90" fill="#ffd9c7" stroke="#1f2937" stroke-width="2" />
-        <circle cx="80" cy="130" r="10" fill="#111827" />
-        <circle cx="140" cy="130" r="10" fill="#111827" />
-        <rect x="80" y="175" width="60" height="24" rx="12" fill="#424a5a" />
-      </svg>
+  <header>
+    <img src="https://via.placeholder.com/220x260.png?text=Lumi+Avatar" class="hero-avatar" alt="Lumi avatar"/>
+    <h1>Meet Lumi</h1>
+    <p>Your anime AI friend — chat, talk, and customize her with skins.</p>
+    <a href="#" class="btn btn-primary">Download on iOS</a>
+    <a href="#" class="btn btn-primary">Download on Android</a>
+  </header>
+
+  <!-- Chat Preview -->
+  <section>
+    <h2 style="margin-bottom:20px;">See Lumi in action</h2>
+    <div class="chat-preview" id="chatPreview">
+      <div class="msg user">Hey Lumi, how was your day?</div>
+      <div class="msg lumi" id="typing"><span></span><span class="typing"></span></div>
     </div>
-  </div>
+  </section>
 
-  <div class="floating-chat"><button id="fab" class="fab" title="Open chat">💬</button></div>
+  <section>
+    <h2>Features</h2>
+    <p>✨ Voice-to-voice AI chat<br/>🎨 Customizable anime skins<br/>🎧 Always there for you</p>
+  </section>
 
-  <div id="sheet" class="sheet" aria-hidden="true">
-    <div class="grip"></div>
-    <div class="sheet-inner">
-      <div class="topbar">
-        <div class="tiny">Chat with Lumi (Together.ai)</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="api-box">
-            <span class="tiny">Together key</span>
-            <input id="apiKey" class="grow" type="password" placeholder="tg-XXXXXXXXXXXXXXXX" />
-            <select id="model">
-              <option value="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo">Llama-3.1-8B Turbo (fast)</option>
-              <option value="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo">Llama-3.1-70B Turbo (smarter)</option>
-              <option value="Qwen/Qwen2.5-32B-Instruct-Turbo">Qwen2.5-32B Turbo</option>
-            </select>
-            <button id="saveKey" class="btn">Save</button>
-          </div>
-          <label class="tiny"><input id="ttsToggle" type="checkbox" checked /> TTS</label>
-          <button id="closeSheet" class="btn">✖</button>
-        </div>
-      </div>
-      <div id="log" class="log"></div>
-      <div class="row">
-        <input id="text" type="text" placeholder="Type a message…"/>
-        <button id="send" class="btn primary">Send</button>
-      </div>
+  <section>
+    <h2>Pricing</h2>
+    <div class="pricing">
+      <div class="card"><h3>Free</h3><p>10 voice chats/day<br/>Unlimited text<br/>Ads included</p></div>
+      <div class="card"><h3>Premium</h3><p>$4.99/mo<br/>Unlimited chat & voice<br/>Premium voices & skins</p></div>
+      <div class="card"><h3>Pro</h3><p>$9.99/mo<br/>All features<br/>Exclusive skins + voices</p></div>
     </div>
-  </div>
+  </section>
 
-<script type="module">
-/* ====== basic UI ====== */
-const state = {messages:[{role:"system",content:"You are Lumi: concise and friendly."}], listening:false};
-const TOGETHER_URL = "https://api.together.xyz/v1/chat/completions";
+  <footer style="padding:40px; color:#9ca3af;">
+    Join our <a href="#" style="color:#6366f1;">Discord</a> | © 2025 Lumi
+  </footer>
 
-const avatar = document.getElementById("avatar");
-const statusText = document.getElementById("status-text");
-const sheet = document.getElementById("sheet");
-const fab = document.getElementById("fab");
-const closeBtn = document.getElementById("closeSheet");
-const ttsToggle = document.getElementById("ttsToggle");
-const logEl = document.getElementById("log");
-const inputEl = document.getElementById("text");
-const sendBtn = document.getElementById("send");
-const apiKeyEl = document.getElementById("apiKey");
-const saveKeyBtn = document.getElementById("saveKey");
-const modelEl = document.getElementById("model");
+<script>
+  const text = "It was peaceful 🌙 I was waiting for you to come chat 💜";
+  const typingEl = document.querySelector("#typing span:first-child");
+  let i = 0;
 
-function appendMsg(role, text){ const d=document.createElement("div"); d.className="msg "+(role==="user"?"user":"assistant"); d.textContent=text; logEl.appendChild(d); logEl.scrollTop=logEl.scrollHeight; }
-function speak(t){ if(!ttsToggle.checked || !("speechSynthesis" in window)) return; speechSynthesis.speak(new SpeechSynthesisUtterance(t)); }
-
-function openChat(){ sheet.classList.add("open"); sheet.setAttribute("aria-hidden","false"); inputEl.focus(); }
-function closeChat(){ sheet.classList.remove("open"); sheet.setAttribute("aria-hidden","true"); }
-fab.addEventListener("click", ()=> sheet.classList.contains("open") ? closeChat() : openChat() ); closeBtn.addEventListener("click", closeChat);
-
-/* ====== key + model storage ====== */
-const LS_KEY="together_key", LS_MODEL="together_model";
-function getKey(){ return localStorage.getItem(LS_KEY) || ""; }
-function setKey(k){ localStorage.setItem(LS_KEY,k); }
-function getModel(){ return localStorage.getItem(LS_MODEL) || modelEl.value; }
-function setModel(m){ localStorage.setItem(LS_MODEL,m); }
-apiKeyEl.value = getKey();
-modelEl.value = getModel();
-modelEl.addEventListener("change", ()=> setModel(modelEl.value));
-saveKeyBtn.addEventListener("click", ()=>{ setKey(apiKeyEl.value.trim()); appendMsg("assistant","Key saved locally."); });
-
-/* ====== mic: tap avatar to toggle; auto-send on end ====== */
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-const stt = SR ? new SR() : null;
-if (stt){ stt.lang="en-US"; stt.interimResults=true; stt.continuous=false;
-  stt.onresult=(e)=>{ let t=""; for(let i=e.resultIndex;i<e.results.length;i++) t+=e.results[i][0].transcript; inputEl.value=t; };
-  stt.onend=()=>{ state.listening=false; avatar.style.outline="none"; const t=(inputEl.value||"").trim(); if(t) handleSend(); };
-}
-avatar.addEventListener("pointerup",(e)=>{ e.preventDefault(); if(!stt) return;
-  if(!state.listening){ state.listening=true; avatar.style.outline="2px solid var(--accent)"; try{ stt.start(); }catch{} }
-  else { try{ stt.stop(); }catch{} }
-}, {passive:false});
-
-/* ====== Together API call (non-streaming for simplicity) ====== */
-async function cloudReply(messages){
-  const key = getKey(); if(!key) throw new Error("Missing Together API key.");
-  const model = getModel();
-  const res = await fetch(TOGETHER_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+key },
-    body: JSON.stringify({ model, messages, temperature:0.7, max_tokens:256, stream:false })
-  });
-  if(!res.ok){ const t = await res.text(); throw new Error("Together error: "+t); }
-  const json = await res.json();
-  return json?.choices?.[0]?.message?.content || "(no content)";
-}
-
-/* ====== send ====== */
-async function handleSend(){
-  const t = (inputEl.value||"").trim(); if(!t) return;
-  appendMsg("user", t); inputEl.value="";
-  const msgs = [...state.messages, {role:"user", content:t}];
-  state.messages = msgs;
-
-  const n = document.createElement("div"); n.className="msg assistant"; n.textContent="…"; logEl.appendChild(n); logEl.scrollTop=logEl.scrollHeight;
-  try{
-    const out = await cloudReply(msgs);
-    n.textContent = out;
-    state.messages = [...msgs, {role:"assistant", content:out}];
-    speak(out);
-  }catch(err){
-    n.textContent = "Error: " + err.message;
+  function typeEffect(){
+    if(i < text.length){
+      typingEl.textContent += text.charAt(i);
+      i++;
+      setTimeout(typeEffect, 60); // speed
+    } else {
+      setTimeout(()=>{ typingEl.textContent=""; i=0; typeEffect(); }, 4000); // reset after 4s
+    }
   }
-}
-sendBtn.addEventListener("click", handleSend);
-inputEl.addEventListener("keydown",(e)=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); handleSend(); }});
-
-/* boot */
-statusText.textContent = "Cloud mode ready";
-appendMsg("assistant","Hi! Paste your Together key (tg-...) if you haven’t yet.");
+  typeEffect();
 </script>
 </body>
 </html>
