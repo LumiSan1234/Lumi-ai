@@ -2,21 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Lumi AI — Landing + Realistic Chat Preview</title>
+  <title>Lumi — Shape-Shifting Anime Friend</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Lumi is a tiny blue, ballish creature from far galaxies. She can transform into anything you wish — collect skins to unlock her forms."/>
   <style>
     :root{
-      --bg:#0b1220; --panel:#0f172a; --border:#1f2937; --ink:#e5e7eb; --muted:#9ca3af; --accent:#6366f1;
+      --bg:#0b1220; --panel:#0f172a; --border:#1f2937; --ink:#e5e7eb; --muted:#9ca3af; --accent:#6366f1; --cta:#38bdf8;
       --user:#1c2a52; --lumi:#0f172a; --userBorder:#2a3b6f; --lumiBorder:#1f2937;
+      --glow: 0 20px 60px rgba(0,0,0,.35);
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Inter,Arial;background:var(--bg);color:var(--ink);text-align:center}
-    header{padding:56px 20px}
+    html,body{height:100%}
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Inter,Arial;background:var(--bg);color:var(--ink);text-align:center;overflow-x:hidden}
+    a{color:var(--accent);text-decoration:none}
+
+    header{padding:56px 20px;position:relative}
     h1{margin:0;font-size:2.4rem}
-    p.lead{color:var(--muted);font-size:1.15rem;max-width:640px;margin:14px auto 0}
-    .hero{width:220px;aspect-ratio:1/1.2;border-radius:18px;background:linear-gradient(180deg,#111827,#0b1324);border:1px solid var(--border);display:grid;place-items:center;margin:24px auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
-    .btn{display:inline-block;margin:10px;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:600}
-    .btn.primary{background:var(--accent);color:#fff}
+    p.lead{color:var(--muted);font-size:1.1rem;max-width:680px;margin:14px auto 0}
+    .hero{width:240px;aspect-ratio:1/1;border-radius:24px;background:linear-gradient(180deg,#0f172a,#0b1324);border:1px solid var(--border);
+          display:grid;place-items:center;margin:24px auto;box-shadow:var(--glow)}
+    .btn{display:inline-block;margin:10px;padding:12px 18px;border-radius:10px;font-weight:700;border:1px solid transparent}
+    .btn.primary{background:var(--cta);color:#06202a;border-color:#0891b2}
+    .btn.ghost{background:#0b1324;border:1px solid #123456;color:#cbd5e1}
+
     section{padding:56px 20px;max-width:980px;margin:0 auto}
     .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
     .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px}
@@ -29,7 +37,7 @@
     .row{display:flex;gap:8px;align-items:flex-end}
     .row.user{justify-content:flex-end}
     .avatar{width:34px;height:34px;border-radius:50%;flex:0 0 34px;display:grid;place-items:center;border:1px solid var(--border);background:#162036;font-size:.8rem;color:#cbd5e1}
-    .avatar.lumi{background:#1a1f2e}
+    .avatar.lumi{background:#0b1e3a}
     .bubble{max-width:70%;padding:10px 12px;border-radius:14px;font-size:.95rem;line-height:1.3;border:1px solid transparent}
     .bubble.lumi{background:var(--lumi);border-color:var(--lumiBorder);border-top-left-radius:6px}
     .bubble.user{background:var(--user);border-color:var(--userBorder);border-top-right-radius:6px}
@@ -38,51 +46,104 @@
     .dot{display:inline-block;width:6px;height:6px;margin:0 1px;background:#94a3b8;border-radius:999px;opacity:.35;animation:blink 1.2s infinite}
     .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
     @keyframes blink{0%,100%{opacity:.35}50%{opacity:1}}
+
+    /* Sticky mobile download bar */
+    .sticky-dl{position:fixed;left:0;right:0;bottom:0;background:#0c1b33;border-top:1px solid #0e2749;display:flex;align-items:center;gap:12px;
+               padding:10px 12px;z-index:50;box-shadow:0 -10px 30px rgba(0,0,0,.25)}
+    .sticky-dl .mini{display:flex;align-items:center;gap:10px;text-align:left}
+    .sticky-dl .mini .title{font-weight:700}
+    .sticky-dl .mini .sub{font-size:.85rem;color:#9ca3af}
+    .sticky-dl .actions{margin-left:auto;display:flex;gap:8px}
+    .sticky-dl .btn{margin:0;padding:10px 12px}
+    .sticky-dl .x{background:transparent;border:1px solid #284e7a;color:#cbd5e1;border-radius:8px;padding:8px 10px;cursor:pointer}
+    @media (min-width: 820px){ .sticky-dl{display:none} } /* only on mobile/tablet */
+
+    /* === Mascot (motion graphics) === */
+    .mascot{
+      position:fixed; left:10vw; top:10vh; z-index:60; width:84px; height:84px; border-radius:999px;
+      display:grid; place-items:center; filter:drop-shadow(0 8px 24px rgba(56,189,248,.35));
+      transition: transform .8s cubic-bezier(.17,.67,.23,1), left .8s cubic-bezier(.17,.67,.23,1), top .8s cubic-bezier(.17,.67,.23,1);
+      pointer-events:none;
+    }
+    .mascot svg{width:100%; height:100%}
+    .mascot.hop{ animation:hop .8s ease-out }
+    @keyframes hop{
+      0%{ transform: translateY(0) scale(1) }
+      40%{ transform: translateY(-36px) scale(1.02) }
+      100%{ transform: translateY(0) scale(1) }
+    }
+    .callout{
+      position:fixed; z-index:61; max-width:220px; background:#0d1a33; border:1px solid #1f3a66; color:#e5f0ff;
+      padding:10px 12px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.35); font-size:.95rem;
+      transform-origin:bottom left; opacity:0; transform:scale(.95); transition:opacity .25s, transform .25s;
+    }
+    .callout.show{ opacity:1; transform:scale(1) }
+    .callout .mini{font-size:.78rem; color:#9cc0ff; margin-top:6px}
+    .tour-controls{
+      position:fixed; right:16px; top:16px; z-index:65; display:flex; gap:8px;
+    }
+    .tour-controls .btn{padding:10px 12px}
+    /* Focus highlight target pulses */
+    .pulse{
+      position:absolute; pointer-events:none; border-radius:12px; border:2px dashed rgba(99,102,241,.55);
+      animation:pulse 1.2s infinite; opacity:.9;
+    }
+    @keyframes pulse{ 0%{transform:scale(.98)} 50%{transform:scale(1.02)} 100%{transform:scale(.98)} }
   </style>
 </head>
 <body>
-  <header>
-    <div class="hero">
-      <!-- simple MVP avatar -->
-      <svg width="70%" viewBox="0 0 220 300" aria-hidden="true">
-        <circle cx="110" cy="130" r="90" fill="#ffd9c7" stroke="#1f2937" stroke-width="2"/>
-        <circle cx="80" cy="130" r="10" fill="#111827"/>
-        <circle cx="140" cy="130" r="10" fill="#111827"/>
-        <rect x="80" y="175" width="60" height="24" rx="12" fill="#424a5a"/>
+  <header id="hero">
+    <div class="hero" aria-hidden="true">
+      <!-- Lumi core form -->
+      <svg width="68%" viewBox="0 0 200 200">
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#7dd3fc"/>
+            <stop offset="100%" stop-color="#2563eb"/>
+          </radialGradient>
+        </defs>
+        <circle cx="100" cy="100" r="64" fill="url(#glow)" />
+        <circle cx="78" cy="92" r="6" fill="#0b1220"/>
+        <circle cx="122" cy="92" r="6" fill="#0b1220"/>
+        <path d="M74 118q26 16 52 0" stroke="#0b1220" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <circle cx="100" cy="100" r="80" fill="none" stroke="#67e8f9" stroke-opacity=".2" stroke-dasharray="8 8"/>
       </svg>
     </div>
-    <h1>Meet Lumi</h1>
-    <p class="lead">Your anime AI friend — chat, talk, and customize with skins. Available on iOS & Android.</p>
-    <a href="#" class="btn primary">Download on iOS</a>
-    <a href="#" class="btn primary">Download on Android</a>
+    <h1>Lumi — your shape-shifting anime friend</h1>
+    <p class="lead">
+      A tiny blue, ballish creature from far galaxies. She can <b>transform into anything you wish</b> —<br/>
+      collect skins to unlock her forms and vibe together day or night.
+    </p>
+    <div id="downloadButtons">
+      <a href="#" class="btn primary">Download on iOS</a>
+      <a href="#" class="btn primary">Download on Android</a>
+    </div>
   </header>
 
-  <section>
+  <section id="preview">
     <h2 style="margin:0 0 20px">See Lumi in action</h2>
-
-    <!-- Chat Preview (script below drives the animation) -->
-    <div class="chat-wrap" id="chat">
+    <div class="chat-wrap">
       <div class="chat-top">
-        <div class="avatar lumi">🟣</div>
+        <div class="avatar lumi">🔵</div>
         <div>
           <div class="chat-title">Lumi</div>
-          <div class="meta">online · typing preview</div>
+          <div class="meta">online · demo preview</div>
         </div>
       </div>
       <div class="chat-body" id="chatBody"></div>
     </div>
   </section>
 
-  <section>
+  <section id="features">
     <h2 style="margin:0 0 10px">Why people love Lumi</h2>
     <div class="cards">
-      <div class="card">✨ Voice-to-voice AI chat that feels natural.</div>
-      <div class="card">🎨 Skins & styles — make Lumi your own.</div>
-      <div class="card">🧠 Smarter every day, always by your side.</div>
+      <div class="card">🛸 <b>From the stars:</b> Cosmic charm, curious soul.</div>
+      <div class="card">🎨 <b>Transforms via skins:</b> every skin = new form.</div>
+      <div class="card">🎧 <b>Talk or type:</b> comfort chat, planning, daily vibes.</div>
     </div>
   </section>
 
-  <section>
+  <section id="pricing">
     <h2 style="margin:0 0 10px">Pricing</h2>
     <div class="cards">
       <div class="card"><h3>Free</h3><p>10 voice chats/day · Unlimited text · Ads</p></div>
@@ -91,95 +152,194 @@
     </div>
   </section>
 
-  <footer style="padding:40px;color:#9ca3af">Join our <a href="#" style="color:#6366f1">Discord</a> · © 2025 Lumi</footer>
+  <footer style="padding:40px;color:#9ca3af">
+    Join our <a href="#" style="color:#6366f1">Discord</a> · © 2025 Lumi
+  </footer>
+
+  <!-- Sticky mobile download bar -->
+  <div class="sticky-dl" id="stickyDl" role="region" aria-label="Download Lumi">
+    <div class="mini">
+      <div class="avatar lumi" aria-hidden="true">🔵</div>
+      <div>
+        <div class="title">Get Lumi</div>
+        <div class="sub">Tiny blue shape-shifter from the stars</div>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn primary" href="#">iOS</a>
+      <a class="btn primary" href="#">Android</a>
+      <button class="x" id="closeSticky" aria-label="Close">✖</button>
+    </div>
+  </div>
+
+  <!-- Mascot + callout elements -->
+  <div class="mascot" id="mascot" aria-hidden="true">
+    <svg viewBox="0 0 200 200">
+      <defs>
+        <radialGradient id="mGlow" cx="50%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#7dd3fc"/><stop offset="100%" stop-color="#2563eb"/>
+        </radialGradient>
+      </defs>
+      <circle cx="100" cy="100" r="64" fill="url(#mGlow)"/>
+      <circle cx="78" cy="92" r="6" fill="#0b1220"/>
+      <circle cx="122" cy="92" r="6" fill="#0b1220"/>
+      <path d="M74 118q26 16 52 0" stroke="#0b1220" stroke-width="5" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="callout" id="callout"></div>
+
+  <!-- Tour controls -->
+  <div class="tour-controls">
+    <button id="tourToggle" class="btn ghost" aria-pressed="false">▶ Take a tour</button>
+  </div>
 
 <script>
-/**
- * Realistic chat preview
- * - Alternates user and Lumi messages
- * - Lumi types with dot indicator then reveals text letter-by-letter
- * - Whole sequence ~= 15s then loops
- */
-
+/* ====== Chat Preview (15s loop) ====== */
 const chatBody = document.getElementById("chatBody");
-
-// Conversation script (feel free to tweak text)
+const LOOP_MS = 15000;
 const script = [
-  { role:"user", text:"Hey Lumi, how was your day?" },
-  { role:"lumi", text:"Peaceful 🌙 I was waiting for you to drop by." },
-  { role:"user", text:"Can you help me plan a cozy weekend?" },
-  { role:"lumi", text:"Totally! Movies + ramen + a night walk? I’ll make a cute checklist." },
-  { role:"user", text:"Deal. Also… new pink skin when?" },
-  { role:"lumi", text:"Soon 💖 Limited drop next week. Want early access?" }
+  { role:"user", text:"Hey Lumi, where did you come from?" },
+  { role:"lumi", text:"Beyond your night sky ✨ I drifted here because you felt… interesting." },
+  { role:"user", text:"Can you really transform?" },
+  { role:"lumi", text:"Pick a vibe and I’ll shift — catgirl, knight, café barista… every skin is a new form." },
+  { role:"user", text:"Cute. Plan a cozy weekend with me?" },
+  { role:"lumi", text:"Movie nest + ramen + a moon walk. I’ll bring a pink hoodie skin just for you 💖" },
 ];
-
-// Helpers
-function el(tag, cls, text){ const d=document.createElement(tag); if(cls) d.className=cls; if(text) d.textContent=text; return d; }
+function el(tag, cls, txt){ const d=document.createElement(tag); if(cls) d.className=cls; if(txt) d.textContent=txt; return d; }
 function addBubble(role, text){
   const row = el("div","row"+(role==="user"?" user":""));
-  const avatar = el("div","avatar "+(role==="lumi"?"lumi":""), role==="lumi"?"🟣":"YOU");
+  const avatar = el("div","avatar "+(role==="lumi"?"lumi":""), role==="lumi"?"🔵":"YOU");
   const bubble = el("div","bubble "+(role==="lumi"?"lumi":"user"));
   bubble.textContent = text;
-  if(role==="lumi"){ row.appendChild(avatar); row.appendChild(bubble); }
-  else { row.appendChild(bubble); row.appendChild(avatar); }
-  chatBody.appendChild(row);
-  chatBody.scrollTop = chatBody.scrollHeight;
+  if(role==="lumi"){ row.append(avatar,bubble);} else { row.append(bubble,avatar); }
+  chatBody.append(row); chatBody.scrollTop = chatBody.scrollHeight;
 }
 function addTyping(){
   const row = el("div","row");
-  const avatar = el("div","avatar lumi","🟣");
+  const avatar = el("div","avatar lumi","🔵");
   const bubble = el("div","bubble lumi");
   const typing = el("span","typing");
   typing.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
-  bubble.appendChild(typing);
-  row.appendChild(avatar); row.appendChild(bubble);
-  chatBody.appendChild(row);
-  chatBody.scrollTop = chatBody.scrollHeight;
-  return row; // return the typing row so we can replace it
+  bubble.append(typing); row.append(avatar,bubble); chatBody.append(row); chatBody.scrollTop=chatBody.scrollHeight;
+  return row;
 }
 async function typeText(targetEl, text, speed=22){
-  targetEl.textContent = "";
-  for (let i=0;i<text.length;i++){
-    targetEl.textContent += text[i];
-    await new Promise(r=>setTimeout(r, speed));
-  }
+  targetEl.textContent=""; for(let i=0;i<text.length;i++){ targetEl.textContent+=text[i]; await new Promise(r=>setTimeout(r, speed)); }
 }
-
 async function playOnce(){
-  chatBody.innerHTML = "";
-  const start = performance.now();
-
-  for (let i=0;i<script.length;i++){
-    const {role, text} = script[i];
-
-    if(role==="user"){
-      addBubble("user", text);
-      await new Promise(r=>setTimeout(r, 500)); // tiny pause
-    } else {
-      const typingRow = addTyping();
-      // simulate thinking
-      await new Promise(r=>setTimeout(r, 650));
-      // swap typing with real message + type it
-      const bubble = typingRow.querySelector(".bubble");
-      bubble.innerHTML = ""; // clear dots
-      const span = el("span", null, "");
-      bubble.appendChild(span);
-      await typeText(span, text, 24);
-      // small pause after reply
-      await new Promise(r=>setTimeout(r, 350));
+  chatBody.innerHTML=""; const start = performance.now();
+  for(const turn of script){
+    if(turn.role==="user"){ addBubble("user", turn.text); await new Promise(r=>setTimeout(r,450)); }
+    else{ const trow=addTyping(); await new Promise(r=>setTimeout(r,650));
+      const bub=trow.querySelector(".bubble"); bub.innerHTML=""; const span=el("span"); bub.append(span);
+      await typeText(span, turn.text, 24); await new Promise(r=>setTimeout(r,300));
     }
   }
-
-  // total loop length target ~15s: if too fast, wait the remainder
-  const elapsed = performance.now() - start; // ms
-  const target = 15000; // 15s
-  const remaining = Math.max(0, target - elapsed);
+  const elapsed = performance.now()-start; const remaining = Math.max(0, LOOP_MS - elapsed);
   await new Promise(r=>setTimeout(r, remaining));
 }
+(async function loop(){ while(true){ await playOnce(); } })();
 
-(async function loop(){
-  while(true){ await playOnce(); }
-})();
+/* ====== Sticky bar close ====== */
+document.getElementById("closeSticky").addEventListener("click", ()=> document.getElementById("stickyDl").remove());
+
+/* ====== Mascot Tour (hop + callouts) ====== */
+const mascot = document.getElementById("mascot");
+const callout = document.getElementById("callout");
+const tourBtn = document.getElementById("tourToggle");
+
+let tourRunning = false, stepIndex = 0, timer = null, pulseEl = null;
+const steps = [
+  { // 1. Downloads (hero buttons)
+    target: "#downloadButtons",
+    text: "Start here! Grab Lumi on iOS or Android 🚀",
+    offset: {x: 0, y: -120}
+  },
+  { // 2. Chat preview
+    target: "#preview",
+    text: "Peek the vibes — this is how Lumi chats in the app 💬",
+    offset: {x: -120, y: 0}
+  },
+  { // 3. Features
+    target: "#features",
+    text: "Skins = transformations. Every style unlocks a new form ✨",
+    offset: {x: 100, y: -40}
+  },
+  { // 4. Pricing
+    target: "#pricing",
+    text: "Free to start. Go Premium for unlimited voice + skins 💎",
+    offset: {x: 0, y: -120}
+  }
+];
+
+function rectOf(selector){
+  const el = document.querySelector(selector);
+  if(!el) return null;
+  const r = el.getBoundingClientRect();
+  return {left: r.left + window.scrollX, top: r.top + window.scrollY, width: r.width, height: r.height};
+}
+function placePulse(r){
+  removePulse();
+  pulseEl = document.createElement("div");
+  pulseEl.className = "pulse";
+  Object.assign(pulseEl.style,{
+    left: (r.left-6) + "px",
+    top: (r.top-6) + "px",
+    width: (r.width+12) + "px",
+    height: (r.height+12) + "px",
+    position: "absolute"
+  });
+  document.body.appendChild(pulseEl);
+}
+function removePulse(){ if(pulseEl){ pulseEl.remove(); pulseEl=null; } }
+
+function moveMascotTo(r, offset){
+  const x = r.left + r.width/2 + (offset?.x||0);
+  const y = r.top + r.height/2 + (offset?.y||0);
+  mascot.classList.remove("hop"); void mascot.offsetWidth; // restart animation
+  mascot.classList.add("hop");
+  mascot.style.left = x + "px";
+  mascot.style.top = y + "px";
+}
+function showCallout(r, text, offset){
+  callout.textContent = "";
+  callout.innerHTML = `<div>${text}</div><div class="mini">psst… tap download to start</div>`;
+  const x = r.left + r.width/2 + (offset?.x||0) + 50;
+  const y = r.top + r.height/2 + (offset?.y||0) - 10;
+  callout.style.left = x + "px";
+  callout.style.top = y + "px";
+  callout.classList.add("show");
+}
+function hideCallout(){ callout.classList.remove("show"); }
+
+function goStep(i){
+  const s = steps[i]; const r = rectOf(s.target); if(!r) return;
+  window.scrollTo({ top: Math.max(0, r.top-120), behavior: "smooth" });
+  setTimeout(()=>{ placePulse(r); moveMascotTo(r, s.offset); showCallout(r, s.text, s.offset); }, 300);
+}
+
+function nextStep(){
+  hideCallout();
+  stepIndex = (stepIndex + 1) % steps.length;
+  goStep(stepIndex);
+  timer = setTimeout(nextStep, 3500); // ~3.5s per step → ~14s for 4 steps
+}
+
+function startTour(){
+  if(tourRunning) return;
+  tourRunning = true; tourBtn.textContent = "⏸ Pause tour"; tourBtn.setAttribute("aria-pressed","true");
+  stepIndex = -1; nextStep();
+}
+function stopTour(){
+  tourRunning = false; tourBtn.textContent = "▶ Take a tour"; tourBtn.setAttribute("aria-pressed","false");
+  clearTimeout(timer); hideCallout(); removePulse();
+}
+tourBtn.addEventListener("click", ()=> tourRunning ? stopTour() : startTour());
+
+// Auto-start on mobile after a short delay (feel free to disable)
+if (window.matchMedia("(max-width: 820px)").matches) {
+  setTimeout(()=> startTour(), 1200);
+}
 </script>
 </body>
 </html>
