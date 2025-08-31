@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lumi — Desktop = On-device • Mobile = Cloud Fallback</title>
+<title>Lumi — Together.ai Only</title>
 <style>
 :root{--bg1:#0b1220;--bg2:#0f172a;--panel:#111827;--border:#1f2937;--text:#e5e7eb;--muted:#9ca3af;--accent:#6366f1;--ok:#34d399;--warn:#f59e0b;--err:#ef4444;}
 *{box-sizing:border-box}html,body{height:100%}
@@ -11,7 +11,7 @@ body{margin:0;background:radial-gradient(1200px 800px at 50% 20%,#13203f 0%,var(
 .center{position:absolute;inset:0;display:grid;place-items:center}
 .avatar-wrap{width:clamp(280px,38vw,440px);aspect-ratio:1/1.15;border-radius:24px;background:#111827;border:1px solid var(--border);display:grid;place-items:center;position:relative;cursor:pointer;box-shadow:0 30px 80px rgba(0,0,0,.35)}
 .badge{position:absolute;top:10px;right:12px;font-size:12px;color:var(--muted);background:rgba(15,23,42,.7);border:1px solid var(--border);padding:6px 8px;border-radius:10px;display:inline-flex;gap:8px;align-items:center}
-.dot{width:8px;height:8px;border-radius:999px;background:var(--warn)}.dot.ready{background:var(--ok)}.dot.error{background:var(--err)}
+.dot{width:8px;height:8px;border-radius:999px;background:var(--ok)}
 .floating-chat{position:fixed;right:18px;bottom:18px;z-index:40}.fab{width:56px;height:56px;border-radius:999px;border:none;background:var(--accent);color:#fff;font-size:22px;cursor:pointer}
 .sheet{position:fixed;left:0;right:0;bottom:-70vh;height:70vh;z-index:50;background:#0f172a;border-top:1px solid var(--border);border-radius:16px 16px 0 0;transition:transform .35s ease;transform:translateY(0)}
 .sheet.open{transform:translateY(-70vh)}.sheet .grip{width:48px;height:5px;background:#334155;border-radius:999px;margin:8px auto}
@@ -20,21 +20,25 @@ body{margin:0;background:radial-gradient(1200px 800px at 50% 20%,#13203f 0%,var(
 .log{overflow:auto;padding:8px;border:1px solid var(--border);border-radius:12px;background:#0b1324}
 .msg{max-width:78%;margin:10px 0;padding:10px 12px;border-radius:12px;font-size:14px;border:1px solid #243044;white-space:pre-wrap;word-break:break-word}
 .msg.user{margin-left:auto;background:#1c2a52;border-color:#334155}.msg.assistant{margin-right:auto;background:#0f172a;border-color:#1f2937}
-.row{display:flex;gap:8px;align-items:center}input[type=text]{flex:1;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#0b1324;color:var(--text)}
-.btn{padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#0f172a;color:var(--text);cursor:pointer}.btn.primary{background:var(--accent);border-color:transparent;color:#fff}
-.api-box{display:none;gap:8px;align-items:center;background:#0b1324;border:1px dashed #334155;padding:8px 10px;border-radius:10px}
-.api-box input{flex:1;padding:8px 10px;border-radius:8px;border:1px solid #334155;background:#0a1324;color:#e5e7eb}
+.row{display:flex;gap:8px;align-items:center}
+input[type=text]{flex:1;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#0b1324;color:#e5e7eb}
+.btn{padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#0f172a;color:#e5e7eb;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:transparent;color:#fff}
+.api-box{display:flex;gap:8px;align-items:center;background:#0b1324;border:1px dashed #334155;padding:8px 10px;border-radius:10px}
+.api-box input, .api-box select{padding:8px 10px;border-radius:8px;border:1px solid #334155;background:#0a1324;color:#e5e7eb}
+.api-box .grow{flex:1}
 </style>
 </head>
 <body>
   <div class="center">
     <div id="avatar" class="avatar-wrap">
-      <div class="badge"><span id="status-text">Checking device…</span><span id="dot" class="dot"></span></div>
+      <div class="badge"><span id="status-text">Cloud mode ready</span><span id="dot" class="dot"></span></div>
+      <!-- simple MVP face -->
       <svg width="72%" viewBox="0 0 220 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="110" cy="130" r="90" fill="#f7d8c7" stroke="#1f2937" stroke-width="2" />
+        <circle cx="110" cy="130" r="90" fill="#ffd9c7" stroke="#1f2937" stroke-width="2" />
         <circle cx="80" cy="130" r="10" fill="#111827" />
         <circle cx="140" cy="130" r="10" fill="#111827" />
-        <rect x="80" y="175" width="60" height="24" rx="12" fill="#0f172a" opacity="0.7" />
+        <rect x="80" y="175" width="60" height="24" rx="12" fill="#424a5a" />
       </svg>
     </div>
   </div>
@@ -45,11 +49,16 @@ body{margin:0;background:radial-gradient(1200px 800px at 50% 20%,#13203f 0%,var(
     <div class="grip"></div>
     <div class="sheet-inner">
       <div class="topbar">
-        <div class="tiny">Chat with Lumi</div>
+        <div class="tiny">Chat with Lumi (Together.ai)</div>
         <div style="display:flex;gap:8px;align-items:center">
-          <div id="apiBox" class="api-box">
-            <span class="tiny">Together API key</span>
-            <input id="apiKey" type="password" placeholder="tg-XXXXXXXXXXXXXXXX" />
+          <div class="api-box">
+            <span class="tiny">Together key</span>
+            <input id="apiKey" class="grow" type="password" placeholder="tg-XXXXXXXXXXXXXXXX" />
+            <select id="model">
+              <option value="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo">Llama-3.1-8B Turbo (fast)</option>
+              <option value="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo">Llama-3.1-70B Turbo (smarter)</option>
+              <option value="Qwen/Qwen2.5-32B-Instruct-Turbo">Qwen2.5-32B Turbo</option>
+            </select>
             <button id="saveKey" class="btn">Save</button>
           </div>
           <label class="tiny"><input id="ttsToggle" type="checkbox" checked /> TTS</label>
@@ -65,10 +74,11 @@ body{margin:0;background:radial-gradient(1200px 800px at 50% 20%,#13203f 0%,var(
   </div>
 
 <script type="module">
-/* ---------- shared UI ---------- */
-const state = { engine:null, ready:false, messages:[{role:"system",content:"You are Lumi: concise and friendly."}], listening:false, cloud:false };
+/* ====== basic UI ====== */
+const state = {messages:[{role:"system",content:"You are Lumi: concise and friendly."}], listening:false};
+const TOGETHER_URL = "https://api.together.xyz/v1/chat/completions";
+
 const avatar = document.getElementById("avatar");
-const dot = document.getElementById("dot");
 const statusText = document.getElementById("status-text");
 const sheet = document.getElementById("sheet");
 const fab = document.getElementById("fab");
@@ -77,120 +87,77 @@ const ttsToggle = document.getElementById("ttsToggle");
 const logEl = document.getElementById("log");
 const inputEl = document.getElementById("text");
 const sendBtn = document.getElementById("send");
-const apiBox = document.getElementById("apiBox");
-const apiKeyInput = document.getElementById("apiKey");
+const apiKeyEl = document.getElementById("apiKey");
 const saveKeyBtn = document.getElementById("saveKey");
+const modelEl = document.getElementById("model");
 
-function appendMsg(role, text){ const d=document.createElement("div"); d.className="msg " + (role==="user"?"user":"assistant"); d.textContent=text; logEl.appendChild(d); logEl.scrollTop=logEl.scrollHeight; }
-function speak(t){ if(!ttsToggle.checked || !("speechSynthesis" in window)) return; const u = new SpeechSynthesisUtterance(t); speechSynthesis.speak(u); }
+function appendMsg(role, text){ const d=document.createElement("div"); d.className="msg "+(role==="user"?"user":"assistant"); d.textContent=text; logEl.appendChild(d); logEl.scrollTop=logEl.scrollHeight; }
+function speak(t){ if(!ttsToggle.checked || !("speechSynthesis" in window)) return; speechSynthesis.speak(new SpeechSynthesisUtterance(t)); }
 
 function openChat(){ sheet.classList.add("open"); sheet.setAttribute("aria-hidden","false"); inputEl.focus(); }
 function closeChat(){ sheet.classList.remove("open"); sheet.setAttribute("aria-hidden","true"); }
 fab.addEventListener("click", ()=> sheet.classList.contains("open") ? closeChat() : openChat() ); closeBtn.addEventListener("click", closeChat);
 
-/* ---------- speech-to-text (tap avatar to start/stop; auto-send on end) ---------- */
+/* ====== key + model storage ====== */
+const LS_KEY="together_key", LS_MODEL="together_model";
+function getKey(){ return localStorage.getItem(LS_KEY) || ""; }
+function setKey(k){ localStorage.setItem(LS_KEY,k); }
+function getModel(){ return localStorage.getItem(LS_MODEL) || modelEl.value; }
+function setModel(m){ localStorage.setItem(LS_MODEL,m); }
+apiKeyEl.value = getKey();
+modelEl.value = getModel();
+modelEl.addEventListener("change", ()=> setModel(modelEl.value));
+saveKeyBtn.addEventListener("click", ()=>{ setKey(apiKeyEl.value.trim()); appendMsg("assistant","Key saved locally."); });
+
+/* ====== mic: tap avatar to toggle; auto-send on end ====== */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const stt = SR ? new SR() : null;
 if (stt){ stt.lang="en-US"; stt.interimResults=true; stt.continuous=false;
-  stt.onresult = (e)=>{ let t=""; for(let i=e.resultIndex;i<e.results.length;i++) t+=e.results[i][0].transcript; inputEl.value=t; };
-  stt.onend = ()=>{ state.listening=false; avatar.style.outline="none"; const t=(inputEl.value||"").trim(); if(t) handleSend(); };
+  stt.onresult=(e)=>{ let t=""; for(let i=e.resultIndex;i<e.results.length;i++) t+=e.results[i][0].transcript; inputEl.value=t; };
+  stt.onend=()=>{ state.listening=false; avatar.style.outline="none"; const t=(inputEl.value||"").trim(); if(t) handleSend(); };
 }
 avatar.addEventListener("pointerup",(e)=>{ e.preventDefault(); if(!stt) return;
   if(!state.listening){ state.listening=true; avatar.style.outline="2px solid var(--accent)"; try{ stt.start(); }catch{} }
   else { try{ stt.stop(); }catch{} }
 }, {passive:false});
 
-/* ---------- device / WebGPU detection ---------- */
-const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-const hasWebGPU = !!navigator.gpu;
-state.cloud = isMobile || !hasWebGPU;
-
-/* ---------- cloud (Together) fallback ---------- */
-const TOGETHER_URL = "https://api.together.xyz/v1/chat/completions";
-const TOGETHER_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"; // fast & good
-function getKey(){ return localStorage.getItem("together_key") || ""; }
-function setKey(k){ localStorage.setItem("together_key", k); }
-
-function showApiBoxIfNeeded(){
-  if (state.cloud){
-    const k = getKey();
-    apiBox.style.display = "flex";
-    if (k) apiKeyInput.value = k;
-  } else {
-    apiBox.style.display = "none";
-  }
-}
-saveKeyBtn.addEventListener("click", ()=>{ const k = apiKeyInput.value.trim(); if(k){ setKey(k); appendMsg("assistant","Key saved locally. You can hide this box."); } });
-
+/* ====== Together API call (non-streaming for simplicity) ====== */
 async function cloudReply(messages){
-  const key = getKey();
-  if (!key) throw new Error("Missing Together API key.");
-  const body = { model: TOGETHER_MODEL, messages, temperature: 0.7, max_tokens: 256, stream: false };
-  const res = await fetch(TOGETHER_URL, {
-    method: "POST",
-    headers: { "Content-Type":"application/json", "Authorization":"Bearer " + key },
-    body: JSON.stringify(body)
+  const key = getKey(); if(!key) throw new Error("Missing Together API key.");
+  const model = getModel();
+  const res = await fetch(TOGETHER_URL,{
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+key },
+    body: JSON.stringify({ model, messages, temperature:0.7, max_tokens:256, stream:false })
   });
-  if (!res.ok){ const t = await res.text(); throw new Error("Together API error: " + t); }
+  if(!res.ok){ const t = await res.text(); throw new Error("Together error: "+t); }
   const json = await res.json();
   return json?.choices?.[0]?.message?.content || "(no content)";
 }
 
-/* ---------- on-device (WebLLM) path ---------- */
-async function initLocal(){
-  statusText.textContent = "Loading on-device model… 0%";
-  try{
-    const webllm = await import("https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm/+esm");
-    const appConfig = await webllm.prebuiltAppConfig;
-    const id = appConfig.model_list[0].model_id; // let WebLLM pick first available (your working path)
-    const eng = await webllm.CreateMLCEngine(id, {
-      appConfig,
-      initProgressCallback: (r)=>{ statusText.textContent=(r?.text||"Loading…")+" "+Math.round((r?.progress??0)*100)+"%"; }
-    });
-    state.engine = eng; state.ready = true; dot.classList.add("ready"); statusText.textContent = "Ready (on-device)";
-    appendMsg("assistant","Hi! On desktop I'm running fully on your device.");
-  }catch(e){ console.error(e); statusText.textContent="Failed"; dot.classList.add("error"); appendMsg("assistant","On-device load failed. Reload or try mobile fallback."); }
-}
-
-/* ---------- cloud init ---------- */
-async function initCloud(){
-  dot.classList.add("ready");
-  statusText.textContent = "Ready (cloud)";
-  appendMsg("assistant","Hi! On this device I'm using the cloud fallback.");
-}
-
-/* ---------- send ---------- */
+/* ====== send ====== */
 async function handleSend(){
   const t = (inputEl.value||"").trim(); if(!t) return;
   appendMsg("user", t); inputEl.value="";
   const msgs = [...state.messages, {role:"user", content:t}];
   state.messages = msgs;
-  const n = document.createElement("div"); n.className="msg assistant"; n.textContent="…"; logEl.appendChild(n); logEl.scrollTop=logEl.scrollHeight;
 
+  const n = document.createElement("div"); n.className="msg assistant"; n.textContent="…"; logEl.appendChild(n); logEl.scrollTop=logEl.scrollHeight;
   try{
-    let out="";
-    if (state.cloud){
-      out = await cloudReply(msgs);
-    } else {
-      if(!state.ready || !state.engine){ n.textContent="(loading model…)"; return; }
-      const stream = await state.engine.chat.completions.create({messages:msgs, temperature:0.7, stream:true, max_tokens:256});
-      let acc=""; for await (const chunk of stream){ const d = chunk?.choices?.[0]?.delta?.content ?? ""; if(!d) continue; acc+=d; n.textContent=acc; logEl.scrollTop=logEl.scrollHeight; }
-      out = n.textContent;
-    }
-    n.textContent = out; state.messages = [...msgs, {role:"assistant", content:out}]; speak(out);
+    const out = await cloudReply(msgs);
+    n.textContent = out;
+    state.messages = [...msgs, {role:"assistant", content:out}];
+    speak(out);
   }catch(err){
-    console.error(err); n.textContent = "Error: " + err.message;
-    if (state.cloud && /Missing Together API key/i.test(err.message)) { apiBox.style.display="flex"; }
+    n.textContent = "Error: " + err.message;
   }
 }
 sendBtn.addEventListener("click", handleSend);
-inputEl.addEventListener("keydown", (e)=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); handleSend(); }});
+inputEl.addEventListener("keydown",(e)=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); handleSend(); }});
 
-/* ---------- boot ---------- */
-showApiBoxIfNeeded();
-if (state.cloud) { statusText.textContent="Cloud mode (mobile or no WebGPU)"; initCloud(); }
-else { await initLocal(); }
+/* boot */
+statusText.textContent = "Cloud mode ready";
+appendMsg("assistant","Hi! Paste your Together key (tg-...) if you haven’t yet.");
 </script>
 </body>
 </html>
-
